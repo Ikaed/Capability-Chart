@@ -1,0 +1,57 @@
+﻿.boxleft {
+    width: 550px;
+    float: left;
+}
+
+    .boxleft table {
+        margin: auto;
+    }
+
+table td, table th {
+    border: 1px solid #cad9ea;
+    color: #666;
+    height: 40px;
+}
+
+table thead th {
+    background-color: #CCE8EB;
+    width: 100px;
+}
+
+table tr:nth-child(odd) {
+    background: #fff;
+}
+
+table tr:nth-child(even) {
+    background: #F5FAFA;
+}
+
+.boxright {
+    width: 550px;
+    float: left;
+}
+
+    .boxright form {
+        margin: 0px auto
+    }
+
+.bts {
+    background-color: #004d9c;
+    border: none;
+    color: white;
+    border-radius: 4px;
+    font-family: 'crique_grotesk_display', sans-serif;
+    font-weight: bold;
+}
+
+    .bts a {
+        color: white;
+        transition: color 0.2s, border-color 0.2s;
+        border-bottom: 2px solid transparent;
+        font-family: crique_grotesk_display_light;
+    }
+
+    .bts:hover {
+        color: #000000;
+        opacity: 0.6;
+    }

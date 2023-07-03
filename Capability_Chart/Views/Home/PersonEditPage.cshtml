@@ -1,0 +1,151 @@
+﻿@{
+    ViewData["Title"] = "PersonEditPage";
+}
+<link rel="stylesheet" href="~/css/personEdit.css" />
+
+@{ bool alreadyAssigned = false; }
+<div class="box">
+    <ul style="background-color: transparent;height:50px; float:left" class="breadcrumb">
+        <li><a class="nav-item" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+        <li><a class="nav-item" asp-area="" asp-controller="Home" asp-action="TeamPage" asp-route-id="@ViewData["TeamID"]">Team Page</a></li>
+        <li><a class="nav-item" asp-area="" asp-controller="Home" asp-action="PersonPage" asp-route-empid="@ViewData["id"]">Person Page</a></li>
+        <li><span style="color: #bdbcb9">Person Edit Page</span></li>
+    </ul>
+    <h1 style="text-align:center;color:black; background-color:transparent;margin-right:10%;">@ViewData["firstname"] @ViewData["lastname"]</h1>
+    <figure style="border:1px solid #000000" class="highcharts-figure">
+        @*<figure class="highcharts-figure">
+                <div id="highchart"></div>
+            </figure>*@
+        @using Highsoft.Web.Mvc.Charts
+        @using Highsoft.Web.Mvc.Charts.Rendering
+        @*Highchart Spider*@
+        @{ var chartOptions =
+                         new Highcharts
+                         {
+                             Chart = new Highsoft.Web.Mvc.Charts.Chart
+                             {
+                                 Polar = true
+                             },
+                             Title = new Title
+                             {
+                                 Text = "Person Skills",
+                                 X = -80
+                             },
+                             Pane = new Pane
+                             {
+                                 Size = "80%"
+                             },
+                             XAxis = new List<XAxis>
+                                 {
+                new XAxis
+                {
+                    Categories = ViewData["skillNames"] as List<String>,
+                TickmarkPlacement = XAxisTickmarkPlacement.On,
+                    LineWidth = 0
+                }
+                                         },
+                             YAxis = new List<YAxis>
+                               {
+                new YAxis
+                {
+                    Max = 5.0, //Minimum Range
+                    MinRange = 0.0, //Maximum Range
+                    GridLineInterpolation = YAxisGridLineInterpolation.Polygon,
+                    LineWidth = 0,
+                    Min = 0
+                }
+                                                                           },
+                             Tooltip = new Tooltip
+                             {
+                                 Shared = true,
+                                 PointFormat = "<span style=\"color:{series.color}\">Rating: <b>{point.y:,.0f}</b><br/>"
+                             },
+                             Legend = new Legend
+                             {
+                                 Align = LegendAlign.Right,
+                                 VerticalAlign = LegendVerticalAlign.Top,
+                                 Y = 70,
+                                 Layout = LegendLayout.Vertical
+                             },
+                             Series = new List<Series>
+                               {
+                new LineSeries
+                {
+                    Name = "Skills",
+                    PointPlacement = new PointPlacement
+                    {
+                        PointPlacementEnum = PointPlacementEnum.On
+                    },
+                    Data = ViewData["Ratings"] as List<LineSeriesData>
+                }
+                                               }
+                         };
+
+            chartOptions.ID = "chart";
+            var renderer = new HighchartsRenderer(chartOptions);
+        }
+
+        @Html.Raw(renderer.RenderHtml())
+    </figure>
+    <div class="center">
+        <form style="display:inline-flex; margin-left:20%" asp-controller="Home" asp-action="updateEmployeeName" asp-route-empid="@ViewData["id"]" method="post">
+            First name:<br>
+            <input type="text" name="firstname" required placeholder="First name" value="@ViewData["firstname"]">
+            Last name:<br>
+            <input type="text" name="lastname" required placeholder="Last name" value="@ViewData["lastname"]">
+            <input style="margin-left:20px" class="bts" type="submit" value="Save Changes">
+        </form>
+        @*Table with all assigned skills*@
+        <br />
+        <br />
+        <table style="margin-left:120px" border="1">
+            <tr>
+                <th>Assigned Skill</th>
+                <th>Score</th>
+                <th></th>
+            </tr>
+            @foreach (AssignedSkill skills in ViewData["AssignedSkills"] as IList<AssignedSkill>)
+            {
+                <tr>
+                    <td>@skills.Skill.Name</td>
+                    <td>
+                        <form asp-controller="Home" asp-action="assignScoreToAssignedSkill" asp-route-empid="@skills.EmpId" asp-route-skillid="@skills.SkillId" method="post">
+                            <input type="number" name="score" pattern="[0-5]" value="@skills.AssignedScore" />
+                            <input type="submit" class="bts" value="Save Score">
+                        </form>
+                    </td>
+                    <td><form asp-controller="Home" asp-action="removeSkillFromPerson" asp-route-empid="@skills.EmpId" asp-route-skillid="@skills.SkillId"><button class="bts" style="background-color:#db116c" type="submit">Unassign Skill</button></form></td>
+                </tr>
+            }
+
+        </table>
+
+        @*Table with all skills*@
+        <table style="margin-left:50px">
+            <tr>
+                <th>Skill Library</th>
+                <th></th>
+            </tr>
+            @foreach (var skills in ViewData["Skills"] as IList<Skills>)
+            {
+
+                foreach (var assignedSkill in ViewData["AssignedSkills"] as IList<AssignedSkill>)
+                {
+                    if (skills.Id == assignedSkill.SkillId)
+                    {
+                        alreadyAssigned = true;
+                    }
+                }
+                if (!alreadyAssigned)
+                {
+                    <tr>
+                        <td>@skills.Name</td>
+                        <td><form asp-controller="Home" asp-action="addSkillToPerson" asp-route-empid="@ViewData["id"]" asp-route-skillid="@skills.Id"><button class="bts" style="background-color:darkgray" type="submit">Assign Skill To Person</button></form></td>
+                    </tr>
+                }
+                alreadyAssigned = false;
+            }
+        </table>
+    </div>
+</div>
+

@@ -1,0 +1,257 @@
+﻿-- phpMyAdmin SQL Dump
+-- version 4.8.4
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Mar 13, 2020 at 10:49 AM
+-- Server version: 10.1.37-MariaDB
+-- PHP Version: 7.3.1
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `capability_chart`
+--
+
+DELIMITER $$
+--
+-- Procedures
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `add_employee` (IN `fname` VARCHAR(20), IN `lname` VARCHAR(20))  BEGIN
+insert into employee(firstname,lastname) values (fname,lname);
+end$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `alter_skill_assignment` (IN `id_in` INT(9), IN `new_skill_id` INT(9), IN `new_emp_id` INT(9), IN `new_assigned_score` INT)  BEGIN
+UPDATE assigned_skill SET assigned_skill.skill_id = new_skill_id, assigned_skill.emp_id = new_emp_id, assigned_skill.assigned_score = new_assigned_score WHERE id = id_in;
+   
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `assign_employee_to_team` (IN `emp_id_in` INT(9), IN `team_id_in` INT(9))  BEGIN
+  UPDATE employee SET employee.assigned_team = team_id_in
+    WHERE employee.id = emp_id_in;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `assign_skill` (IN `skill_id_in` INT(9), IN `emp_id_in` INT(9), IN `assigned_score_in` TINYINT)  BEGIN
+  Insert into assigned_skill (skill_id, emp_id, assigned_score_in)
+    values (skill_id_in, emp_id_in, assigned_score_in);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `create_skill` (IN `name` VARCHAR(20))  BEGIN
+INSERT INTO skills(name) VALUES (name);
+end$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `create_team` (IN `name` VARCHAR(20))  BEGIN
+INSERT INTO teams(name) VALUES (name);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `delete_employee` (IN `idet` INT(9))  BEGIN
+DELETE FROM employee WHERE id=idet;
+end$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `delete_skill` (IN `id_in` INT(9))  BEGIN
+  DELETE FROM skills WHERE id = id_in;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `display_employee` (IN `idet` INT(9))  BEGIN
+SELECT * FROM employee WHERE id=idet;
+end$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `display_skills` (IN `emp_id_in` INT(9))  NO SQL
+BEGIN
+SELECT * FROM assigned_skill
+    WHERE emp_id = emp_id_in;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `display_teams` ()  BEGIN
+SELECT * FROM teams;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `unassign_employee_from_team` (IN `emp_id_in` INT(9))  BEGIN
+  UPDATE employee SET employee.assigned_team = null
+    WHERE id = emp_id_in;
+    
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `unassign_skill` (IN `id_in` INT(9))  BEGIN
+  DELETE FROM assigned_skill WHERE id = id_in;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `update_employee` (IN `idet` INT(9), `firstname` VARCHAR(20), `lastname` VARCHAR(20))  BEGIN
+UPDATE employee SET firstname=firstname, lastname=lastname WHERE id=idet;
+end$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `update_skill` (IN `idet` INT(9), `name` VARCHAR(20))  BEGIN
+UPDATE skills SET name=name WHERE id=idet;
+end$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `update_team` (IN `idet` INT(9), `name` VARCHAR(20))  BEGIN 
+UPDATE teams SET name=name WHERE id=idet;
+END$$
+
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `assigned_skill`
+--
+
+CREATE TABLE `assigned_skill` (
+  `id` int(9) NOT NULL,
+  `skill_id` int(9) DEFAULT NULL,
+  `emp_id` int(9) DEFAULT NULL,
+  `assigned_score` tinyint(4) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `assigned_skill`
+--
+
+INSERT INTO `assigned_skill` (`id`, `skill_id`, `emp_id`, `assigned_score`) VALUES
+(59, 63, 43, 4),
+(60, 64, 43, 2),
+(61, 65, 43, 5),
+(62, 63, 44, 2),
+(63, 64, 44, 4);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `employee`
+--
+
+CREATE TABLE `employee` (
+  `id` int(9) NOT NULL,
+  `firstname` varchar(20) NOT NULL,
+  `lastname` varchar(20) NOT NULL,
+  `assigned_team` int(9) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `employee`
+--
+
+INSERT INTO `employee` (`id`, `firstname`, `lastname`, `assigned_team`) VALUES
+(43, 'Oscar Stig', 'BÃ¤ck', NULL),
+(44, 'Mikael', 'Falk Lundgren', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `skills`
+--
+
+CREATE TABLE `skills` (
+  `id` int(9) NOT NULL,
+  `name` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `skills`
+--
+
+INSERT INTO `skills` (`id`, `name`) VALUES
+(63, 'C#'),
+(64, 'MVC'),
+(65, 'Fikarast');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `teams`
+--
+
+CREATE TABLE `teams` (
+  `id` int(9) NOT NULL,
+  `name` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `assigned_skill`
+--
+ALTER TABLE `assigned_skill`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FK_Emp_Id` (`emp_id`),
+  ADD KEY `FK_Skill_Id` (`skill_id`);
+
+--
+-- Indexes for table `employee`
+--
+ALTER TABLE `employee`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FK_Assigned_Team` (`assigned_team`);
+
+--
+-- Indexes for table `skills`
+--
+ALTER TABLE `skills`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `teams`
+--
+ALTER TABLE `teams`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `assigned_skill`
+--
+ALTER TABLE `assigned_skill`
+  MODIFY `id` int(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
+
+--
+-- AUTO_INCREMENT for table `employee`
+--
+ALTER TABLE `employee`
+  MODIFY `id` int(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+
+--
+-- AUTO_INCREMENT for table `skills`
+--
+ALTER TABLE `skills`
+  MODIFY `id` int(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
+
+--
+-- AUTO_INCREMENT for table `teams`
+--
+ALTER TABLE `teams`
+  MODIFY `id` int(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `assigned_skill`
+--
+ALTER TABLE `assigned_skill`
+  ADD CONSTRAINT `FK_Emp_Id` FOREIGN KEY (`emp_id`) REFERENCES `employee` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_Skill_Id` FOREIGN KEY (`skill_id`) REFERENCES `skills` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+--
+-- Constraints for table `employee`
+--
+ALTER TABLE `employee`
+  ADD CONSTRAINT `FK_Assigned_Team` FOREIGN KEY (`assigned_team`) REFERENCES `teams` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

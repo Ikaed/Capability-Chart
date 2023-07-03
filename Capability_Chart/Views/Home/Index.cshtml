@@ -1,0 +1,156 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@{
+    Dictionary<string, double> featured_skills = ViewData["Featured_Skills"] as Dictionary<string, double>;
+}
+
+
+@*The highchart-more.js file contains definitions for additional chart types not available
+    in the main highcharts.js file such as "arearange". You need to include this file if you
+    are using these types of charts*@
+
+<script src="http://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+<link rel="stylesheet" href="~/css/index.css" />
+
+@using Highsoft.Web.Mvc.Charts
+@using Highsoft.Web.Mvc.Charts.Rendering
+
+<div class="box">
+    <figure class="highcharts-figure" style="border:1px solid #000000;margin-top:50px">
+        @*Highchart Spider*@
+        @{ var chartOptions =
+                         new Highcharts
+                         {
+                             Chart = new Highsoft.Web.Mvc.Charts.Chart
+                             {
+                                 Polar = true
+                             },
+                             Title = new Title
+                             {
+                                 Text = "Team Skills",
+                                 X = -80
+                             },
+                             Pane = new Pane
+                             {
+                                 Size = "80%"
+                             },
+                             XAxis = new List<XAxis>
+                                 {
+                new XAxis
+                {
+                    Categories = ViewData["Skills"] as List<String>,
+                TickmarkPlacement = XAxisTickmarkPlacement.On,
+                    LineWidth = 0
+                }
+                                             },
+                             YAxis = new List<YAxis>
+                               {
+                new YAxis
+                {
+                    Max = 5.0, //Minimum Range
+                    MinRange = 0.0, //Maximum Range
+                    GridLineInterpolation = YAxisGridLineInterpolation.Polygon,
+                    LineWidth = 0,
+                    Min = 0
+                }
+                                                                               },
+                             Tooltip = new Tooltip
+                             {
+                                 Shared = true,
+                                 PointFormat = "<span style=\"color:{series.color}\">Rating: <b>{point.y:,.0f}</b><br/>"
+                             },
+                             Legend = new Legend
+                             {
+                                 Align = LegendAlign.Right,
+                                 VerticalAlign = LegendVerticalAlign.Top,
+                                 Y = 70,
+                                 Layout = LegendLayout.Vertical
+                             },
+                             Series = new List<Series>
+                               {
+                new LineSeries
+                {
+                    Name = "Skill Ratings",
+                    PointPlacement = new PointPlacement
+                    {
+                        PointPlacementEnum = PointPlacementEnum.On
+                    },
+                    Data = ViewData["Ratings"] as List<LineSeriesData>
+                },new LineSeries
+                {
+                    Name = "Max Skill Ratings For Team",
+                    PointPlacement = new PointPlacement
+                    {
+                        PointPlacementEnum = PointPlacementEnum.On
+                    },
+                    Data = ViewData["Max_Skill_Rating"] as List<LineSeriesData>
+                }
+                                                   }
+                         };
+
+            chartOptions.ID = "chart";
+            var renderer = new HighchartsRenderer(chartOptions);
+        }
+
+        @Html.Raw(renderer.RenderHtml())
+
+    </figure>
+
+    <center>
+        <div class="center">
+            @*Dropdown menu with all teams*@
+
+            <select id="TypeID">
+                <option id="dropdown" selected disabled default>Select Team</option>
+                @foreach (var team in ViewData["Teams"] as IList<Teams>)
+                {
+                    if (team.Id == (int)ViewData["TeamID"])
+                    {
+                        <option value=@team.Id selected>@team.Name</option>
+                    }
+                    else
+                    {
+                        <option value=@team.Id>@team.Name</option>
+                    }
+
+                }
+            </select>
+            <form>
+                <button class="btteam" type="submit" asp-controller="Home" asp-action="TeamPage" asp-route-id="@ViewData["TeamID"]">GO TO TEAM PAGE</button>
+            </form>
+
+            @*Script to send the chosen teams id to controller and for now get it back aswell*@
+            <script type="text/javascript">
+            $(function () {
+                //This is the function to display highcharts for different teams
+                $("#TypeID").on("change", function () {
+                    var formData = $("#TypeID").val();
+                    @*var url = "@Url.Action("Index", )";*@
+                    var url = "https://localhost:5001/home/index/?id=" + formData;
+                    console.log(location.href);
+                    window.location.href = url;
+                    //$.post("Home/Create?=formData", { typeId: formData }, function (data) {
+                    //    alert(data.toString());
+                    //}, "text");
+
+                });
+            });
+            </script>
+
+        </div>
+
+
+        @*@foreach (var feature in featured_skills)
+        {
+
+            chartOptions.XAxis[0].Categories.Add(feature.Key);
+
+        }*@
+    </center>
+
+
+</div>
+

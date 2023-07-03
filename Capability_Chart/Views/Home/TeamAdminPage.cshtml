@@ -1,0 +1,126 @@
+﻿@{
+    ViewData["Title"] = "Privacy Policy";
+}
+<link rel="stylesheet" href="~/css/teamadmin.css" />
+<div class="bg" >
+    <div class="boxleft">
+        <h1 style="text-align:center; color:black;margin-bottom:50px">Employees</h1>
+        @*Form for adding new employee*@
+        <form id="addform" asp-controller="Home" asp-action="addEmployee" method="post">
+            <input type="text"  name="firstname" placeholder="First name"required value="">
+            <input type="text" name="lastname" placeholder="Last name"required value="">
+            <input class="bts" type="submit" value="Add New Person">
+        </form>
+
+        <br />
+
+        @*Table with all employees*@
+        <table>
+            <tr>
+                <th>All Employees</th>
+
+            </tr>
+            @foreach (var employees in ViewData["Employee"] as IList<Employee>)
+            {
+                <tr>
+                    <td>@employees.Firstname @employees.Lastname</td>
+                    <td><form asp-controller="Home" asp-action="deleteEmployee" asp-route-id="@employees.Id"><button class="bts" style="background-color:darkgrey" type="submit"><a>Delete Employee</a></button></form></td>
+                </tr>
+            }
+        </table>
+        <br />
+    </div>
+
+    <div class="boxright">
+        <h1 style="text-align:center;color:bl;margin-bottom:50px">Teams</h1>
+        @*Form for adding new team*@
+        <form style="margin-left:25%" class="form" id="addTeamForm" asp-controller="Home" asp-action="addTeam" method="post">
+            <input type="text" name="teamname" placeholder="Team name" required value="">
+            <input class="bts" type="submit" value="Add New Team">
+        </form>
+
+        <br />
+
+        @*Dropdown menu with all teams*@
+        <select id="dropdown" style="width:35%; margin-left:25%">
+            <option selected default disabled>Select Team</option>
+            @foreach (var team in ViewData["Teams"] as IList<Teams>)
+            {
+                if (team.Id == (int)ViewData["TeamID"])
+                {
+                    <option value=@team.Id selected>@team.Name</option>
+                }
+                else
+                {
+                    <option value=@team.Id>@team.Name</option>
+                }
+
+            }
+        </select>
+        @*Button to remove selected team in dropdown*@
+        <form style="margin-left:25%;" id="removeTeamForm" asp-controller="Home" asp-action="deleteTeam" asp-route-id="id" method="post">
+            <input type="hidden" name="id" id="id" value=@ViewData["TeamID"] />
+            <input class="bts" style="background-color:#db116c" type="submit" value="Remove Selected Team" />
+        </form>
+
+        @*Script to get selected team*@
+        <script type="text/javascript">
+            $(function () {
+                $("#dropdown").on("change", function () {
+                    var formData = $("#dropdown").val();
+                    $("input#id").val(formData);
+                    location.href = "https://localhost:5001/Home/TeamAdminPage?id=" + formData;
+                });
+            });
+
+        </script>
+
+
+        <br />
+        <br />
+        @foreach (var teams in ViewData["Teams"] as IList<Teams>)
+        {
+            if ((int)ViewData["TeamID"] == teams.Id)
+            {
+                <h1 style="text-align:center;color:#004d9c">@teams.Name</h1>
+                break;
+            }
+        }
+        @*Table with all team members for chosen team in dropdown*@
+        <table style="margin:auto">
+            <tr>
+                <th>Team Members</th>
+
+
+                @foreach (var employees in ViewData["Test"] as IList<Employee>)
+                {
+                <tr>
+                    <td>@employees.Firstname @employees.Lastname</td>
+                    <td><form asp-controller="Home" asp-action="removeEmployeeFromTeam" asp-route-id="@employees.Id"><button class="bts" style="background-color:#db116c" type="submit">Remove from team</button></form></td>
+                </tr>
+            }
+
+            </table>
+
+            <br />
+
+            @*Table with all employees that has no team assigned to them*@
+            <table style="margin:auto">
+                <tr>
+                    <th>Unassigned Employees</th>
+                </tr>
+                @foreach (var test in ViewData["UnassignedEmployees"] as IList<Employee>)
+                {
+                    <tr>
+                        <td>@test.Firstname @test.Lastname</td>
+                        <td><form asp-controller="Home" asp-action="addEmployeeToTeam" asp-route-empid="@test.Id" asp-route-teamid="@ViewData["TeamID"]"><button class="bts" type="submit">Add to team</button></form></td>
+                    </tr>
+                }
+
+            </table>
+
+
+        </div>
+
+
+    </div>

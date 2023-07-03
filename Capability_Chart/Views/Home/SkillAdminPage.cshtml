@@ -1,0 +1,70 @@
+﻿
+@{
+    ViewData["Title"] = "SkillPage";
+}
+<link rel="stylesheet" href="~/css/teamadmin.css" />
+<div class="bg">
+    <h1 style="text-align: center; color: black; margin-bottom: 50px">Skill</h1>
+
+    @*Form for adding a new skill*@
+    <form style="margin-left:35%" asp-controller="Home" asp-action="AddSkill" asp-route-id="skillname">
+        <input type="text" name="skillname" placeholder="Add skill name" required value="">
+        <input class="bts" type="submit" value="Add New Skill">
+    </form>
+
+    <br />
+
+    @*Form for editing a skill*@
+    <form style="margin-left:35%" id="editform" asp-controller="Home" asp-action="UpdateSkill" method="post">
+        <input type="hidden" name="skillId" id="skillId" value="" />
+        <input type="text" name="newname"  id="newname" placeholder="Select skill in table" required value="">
+        <input class="bts" type="submit" value="Save Changes">
+    </form>
+    <br />
+
+    @*Table with all skills*@
+    <table style="float:left; margin-left:25%">
+        <tr>
+            <th>Skill Library</th>
+        </tr>
+        @foreach (var skills in ViewData["Skills"] as IList<Skills>)
+        {
+            <tr>
+                <td>@skills.Name</td>
+                <td><button class="bts" style="background-color:darkgrey" type="button" id="@skills.Id" value="@skills.Name">Edit Skill</button></td>
+            </tr>
+        }
+    </table>
+
+    @*Script to put name of chosen skill to edit, into the textfield*@
+    <script type="text/javascript">
+        $("button.bts").click(function () {
+            var skillName = $(this).val();
+            var skillID = $(this).attr("id");
+            console.log(skillName);
+            $("input#newname").val(skillName);
+            $("input#skillId").val(skillID);
+        });
+
+    </script>
+
+
+    <br />
+    @*Table with all unassigned skills*@
+    <table style="float:left; margin-left:15%">
+        <tr>
+            <th>Unassigned Skills</th>
+        </tr>
+        @foreach (var unusedSkills in ViewData["UnusedSkills"] as IList<Skills>)
+        {
+            //var num = 0;
+            <tr id="@unusedSkills">
+                <td id="@unusedSkills">@unusedSkills.Name</td>
+                <td id="@unusedSkills"><form asp-controller="Home" asp-action="DelSkill" asp-route-id="@unusedSkills.Id" onclick="return confirm('Do you want to delete this skill?');"><button style="background-color:#db116c" class="bts" type="submit">Remove Skill</button></form></td>
+            </tr>
+
+        }
+    </table>
+
+
+</div>

@@ -1,0 +1,116 @@
+﻿
+@{
+    ViewData["Title"] = "TeamPage";
+}
+
+@using Highsoft.Web.Mvc.Charts
+@using Highsoft.Web.Mvc.Charts.Rendering
+
+<link rel="stylesheet" href="~/css/team.css" />
+<div class="box">
+    <ul style="background-color: transparent;height:50px; float:left" class="breadcrumb">
+        <li><a class="nav-item" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+        <li><span style="color: #bdbcb9">Team Page</span></li>
+    </ul>
+    <h1 style="text-align:center;color:black; background-color:transparent;margin-right:10%;">@ViewData["Teamname"]</h1>
+        <div class="box">
+            <figure class="highcharts-figure" style="border:1px solid #000000;margin-top:50px">
+                @*Highchart Spider*@
+                @{ var chartOptions =
+                                   new Highcharts
+                                   {
+                                       Chart = new Highsoft.Web.Mvc.Charts.Chart
+                                       {
+                                           Polar = true
+                                       },
+                                       Title = new Title
+                                       {
+                                           Text = "Team Skills",
+                                           X = -80
+                                       },
+                                       Pane = new Pane
+                                       {
+                                           Size = "80%"
+                                       },
+                                       XAxis = new List<XAxis>
+                                           {
+                new XAxis
+                {
+                    Categories = ViewData["Skills"] as List<String>,
+                TickmarkPlacement = XAxisTickmarkPlacement.On,
+                    LineWidth = 0
+                }
+                                       },
+                                       YAxis = new List<YAxis>
+                                         {
+                new YAxis
+                {
+                    Max = 5.0, //Minimum Range
+                    MinRange = 0.0, //Maximum Range
+                    GridLineInterpolation = YAxisGridLineInterpolation.Polygon,
+                    LineWidth = 0,
+                    Min = 0
+                }
+                                                                         },
+                                       Tooltip = new Tooltip
+                                       {
+                                           Shared = true,
+                                           PointFormat = "<span style=\"color:{series.color}\">Rating: <b>{point.y:,.0f}</b><br/>"
+                                       },
+                                       Legend = new Legend
+                                       {
+                                           Align = LegendAlign.Right,
+                                           VerticalAlign = LegendVerticalAlign.Top,
+                                           Y = 70,
+                                           Layout = LegendLayout.Vertical
+                                       },
+                                       Series = new List<Series>
+                                         {
+                new LineSeries
+                {
+                    Name = "Skill Ratings",
+                    PointPlacement = new PointPlacement
+                    {
+                        PointPlacementEnum = PointPlacementEnum.On
+                    },
+                    Data = ViewData["Ratings"] as List<LineSeriesData>
+                },new LineSeries
+                {
+                    Name = "Max Skill Ratings For Team",
+                    PointPlacement = new PointPlacement
+                    {
+                        PointPlacementEnum = PointPlacementEnum.On
+                    },
+                    Data = ViewData["Max_Skill_Rating"] as List<LineSeriesData>
+                }
+                                             }
+                                   };
+
+                    chartOptions.ID = "chart";
+                    var renderer = new HighchartsRenderer(chartOptions);
+                }
+
+                @Html.Raw(renderer.RenderHtml())
+
+            </figure>
+        </div>
+        <div class="center">
+            <table>
+                <tr>
+                    <th style="width:250px">All Team Members</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                @foreach (var employees in ViewData["Employees"] as IList<Employee>)
+                {
+                    <tr>
+                        <td>@employees.Firstname @employees.Lastname</td>
+                        <td><button class="bts" type="button"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="PersonEditPage" asp-route-empid="@employees.Id">Edit</a></button></td>
+                        <td><button class="bts" type="button"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="PersonPage" asp-route-empid="@employees.Id">View</a></button></td>
+                    </tr>
+                }
+
+            </table>
+        </div>
+
+</div>
